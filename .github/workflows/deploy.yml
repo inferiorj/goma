@@ -33,14 +33,14 @@ jobs:
       - name: Setup pnpm
         uses: pnpm/action-setup@v5
         with:
-          version: latest [web:1][web:3][web:9]
+          version: latest
       - name: Set up Node
         uses: actions/setup-node@v6
         with:
           node-version: lts/*
-          cache: 'pnpm' [web:1][web:3][web:11]
+          cache: 'pnpm'
       - name: Install dependencies
-        run: pnpm ci [web:1][web:3]
+        run: pnpm ci
       - name: Build
         run: pnpm run build
       - name: Setup Pages
@@ -48,8 +48,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v4
         with:
-          # Upload dist folder
-          path: './dist'
+          path: './dist' # Now valid as separate comment
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
