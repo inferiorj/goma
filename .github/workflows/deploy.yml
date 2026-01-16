@@ -30,15 +30,19 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v5
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v5
+        with:
+          version: latest [web:1][web:3][web:9]
       - name: Set up Node
         uses: actions/setup-node@v6
         with:
           node-version: lts/*
-          cache: 'npm'
+          cache: 'pnpm' [web:1][web:3][web:11]
       - name: Install dependencies
-        run: npm ci
+        run: pnpm ci [web:1][web:3]
       - name: Build
-        run: npm run build
+        run: pnpm run build
       - name: Setup Pages
         uses: actions/configure-pages@v5
       - name: Upload artifact
