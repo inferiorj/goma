@@ -17,16 +17,19 @@ export default function App() {
   const [targetLang, setTargetLang] = useState('es');
   const [loading, setLoading] = useState(false);
 
-  const handleTranslate = async () => {
-    if (!inputText.trim()) return;
-
+  // Core translation logic pulled into a reusable function
+  const performTranslation = async (
+    text: string,
+    source: string,
+    target: string
+  ) => {
+    if (!text.trim()) return;
     setLoading(true);
     try {
-      // MyMemory is a free API that doesn't require a key for basic usage
       const res = await fetch(
         `https://api.mymemory.translated.net/get?q=${encodeURIComponent(
-          inputText
-        )}&langpair=${sourceLang}|${targetLang}`
+          text
+        )}&langpair=${source}|${target}`
       );
       const data = await res.json();
       setTranslatedText(data.responseData.translatedText);
@@ -35,6 +38,24 @@ export default function App() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleTranslate = () =>
+    performTranslation(inputText, sourceLang, targetLang);
+
+  const handleReTranslate = () => {
+    // 1. Swap languages
+    const newSource = targetLang;
+    const newTarget = sourceLang;
+    // 2. Move output to input
+    const newInput = translatedText;
+
+    setSourceLang(newSource);
+    setTargetLang(newTarget);
+    setInputText(newInput);
+
+    // 3. Trigger API call with the NEW values immediately
+    performTranslation(newInput, newSource, newTarget);
   };
 
   return (
@@ -58,7 +79,17 @@ export default function App() {
                 </option>
               ))}
             </select>
-            <span className="text-zinc-400">→</span>
+
+            {/* Swap/Retranslate Button */}
+            <button
+              onClick={handleReTranslate}
+              disabled={!translatedText || loading}
+              className="p-2 rounded-full hover:bg-zinc-100 text-zinc-500 disabled:opacity-30 transition-colors"
+              title="Swap languages and re-translate"
+            >
+              ⇄
+            </button>
+
             <select
               value={targetLang}
               onChange={(e) => setTargetLang(e.target.value)}
@@ -84,7 +115,7 @@ export default function App() {
           <button
             onClick={handleTranslate}
             disabled={loading || !inputText}
-            className="w-full py-3 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 active:scale-98 disabled:opacity-50 disabled:active:scale-100 transition-all cursor-pointer"
+            className="w-full py-3 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 active:scale-98 disabled:opacity-50 transition-all cursor-pointer"
           >
             {loading ? 'Translating...' : 'Translate Text'}
           </button>
